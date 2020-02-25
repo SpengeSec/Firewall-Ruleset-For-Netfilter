@@ -1,1 +1,33 @@
-#R0716728 2CCS A#--Drop All--iptables -P OUTPUT DROPiptables -P INPUT DROP#--Allow updates (be.archive.ubuntu.com)iptables -A OUTPUT -p tcp -d 193.190.67.98 -j ACCEPT#---ICMP Flood---iptables -t filter -A INPUT -p icmp Ðicmp-type echo-requrest -m limit Ðlimit 5/minute -j ACCEPT #limit icmp requests to 5/minuteiptables -t filter -A INPUT -p icmp -j DROP #Drop icmpiptables -t filter -A OUTPUT -p icmp Ðicmp-type echo-reply -j ACCEPT #allow to reply ICMP#--DNS Zonetransferiptables -A INPUT -p tcp Ðdport 53 -j DROP #ZT = TCP == DROPiptables -A INPUT -p udp Ðdport 53 -j ACCEPT #ACCEPT QUERIES#--Allow incoming & established HTTP requestsiptables -A INPUT -m state Ðstate NEW,ESTABLISHED -m tcp -p tcp Ðdport 80 -j ACCEPT#--Allow incoming & established HTTPS requestsiptables -A input -m state Ðstate NEW,ESTABLISHED -m tcp -p tcp Ðdport 443 -j ACCEPT#--Allow incoming FTP requestsiptables -A OUTPUT -p tcp --sport 21 -m state --state ESTABLISHED -j ACCEPTiptables -A OUTPUT -p tcp --sport 20 -m state --state ESTABLISHED,RELATED -j ACCEPTiptables -A OUTPUT -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED -j ACCEPTiptables -A INPUT -p tcp --dport 21 -m state --state NEW,ESTABLISHED -j ACCEPTiptables -A INPUT -p tcp --dport 20 -m state --state ESTABLISHED -j ACCEPTiptables -A INPUT -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED,RELATED,NEW -j ACCEPT
+#R0716728 2CCS A
+
+#--Drop All--
+iptables -P OUTPUT DROP
+iptables -P INPUT DROP
+
+#--Allow updates (be.archive.ubuntu.com)
+iptables -A OUTPUT -p tcp -d 193.190.67.98 -j ACCEPT
+
+#---ICMP Flood---
+iptables -t filter -A INPUT -p icmp â€“icmp-type echo-requrest -m limit â€“limit 5/minute -j ACCEPT #limit icmp requests to 5/minute
+iptables -t filter -A INPUT -p icmp -j DROP #Drop icmp
+iptables -t filter -A OUTPUT -p icmp â€“icmp-type echo-reply -j ACCEPT #allow to reply ICMP
+
+#--DNS Zonetransfer
+iptables -A INPUT -p tcp â€“dport 53 -j DROP #ZT = TCP == DROP
+iptables -A INPUT -p udp â€“dport 53 -j ACCEPT #ACCEPT QUERIES
+
+#--Allow incoming & established HTTP requests
+iptables -A INPUT -m state â€“state NEW,ESTABLISHED -m tcp -p tcp â€“dport 80 -j ACCEPT
+
+#--Allow incoming & established HTTPS requests
+iptables -A input -m state â€“state NEW,ESTABLISHED -m tcp -p tcp â€“dport 443 -j ACCEPT
+
+
+#--Allow incoming FTP requests
+iptables -A OUTPUT -p tcp --sport 21 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 20 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --dport 21 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --dport 20 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --sport 1024: --dport 1024: -m state --state ESTABLISHED,RELATED,NEW -j ACCEPT
+
